@@ -86,6 +86,7 @@ def generate_stroke_dataframe(filepath, i):
     """
     # Reading CSV
     df = ImportData(filepath, i)
+    
     '''
     CHECK IF THIS NEEDS TO BE DONE FOR CURRENT USE CASE ALSO
     # Shifting the timeseries 12 seconds
@@ -104,6 +105,7 @@ def generate_stroke_dataframe(filepath, i):
         np.min(df["Time left (min)"]), np.max(df["Time left (min)"]), len(df.index)
     )
 
+    
     # RIGHT
     # Needing to fix the timeseries, using the same method as MATLAB
     df["Time right (sec)"] = np.linspace(
@@ -113,6 +115,7 @@ def generate_stroke_dataframe(filepath, i):
     df["Time right (min)"] = np.linspace(
         np.min(df["Time right (min)"]), np.max(df["Time right (min)"]), len(df.index)
     )
+
 
     
     # Calling GetStrokes and GetInfo for both left and right
@@ -155,6 +158,11 @@ def ImportData(filepath, skier):
     """
     # Reading CSV and deleting NaN values
     df = pd.read_csv(filepath).dropna()
+    
+    #print("\nJUST AFTER IMPORTING : \n")
+    #print(df)
+
+    
     # Since NaN values are droped we need to reset the indices
     df = df.reset_index(drop=True)
     # The header information
@@ -204,6 +212,7 @@ def GetStrokes(
     rel_height=0.97,
     cutoff_start=2,
     cutoff_end=2,
+    
 ):
     """
     Gets the individual pullings frome the timeseries dataframe
@@ -246,6 +255,20 @@ def GetStrokes(
     height = height * np.max(df[force_string])
     
     # Updating the cutoff at the end
+    
+    #print(df)
+    
+    # ADDED To eliminate the issue of missing indexes
+    df = df.reset_index(drop=True)
+    
+    '''
+    print(cutoff_end)
+    print('\n\n\n\nABC')
+    print(df["Time " + pole.lower() + " (sec)"].values)
+    print('\n\n\n\nDEF')
+    print(df["Time " + pole.lower() + " (sec)"].values[-1])
+    '''
+    
     cutoff_end = df["Time " + pole.lower() + " (sec)"].values[-1] - cutoff_end
     
     # Getting the peaks from force data
@@ -261,6 +284,14 @@ def GetStrokes(
     left_ips = np.floor(left_ips)
     right_ips = np.ceil(right_ips)
 
+    '''
+    print(left_ips)
+    print('\n\n\n\nGHI')
+    print(df["Time " + pole.lower() + " (sec)"][left_ips])
+    print('\n\n\n\nJKL')
+    print(df["Time " + pole.lower() + " (sec)"][left_ips].values)
+    ''' 
+    
     # Getting the time values from index values
     ground_start = df["Time " + pole.lower() + " (sec)"][left_ips].values
     ground_stop = df["Time " + pole.lower() + " (sec)"][right_ips].values
