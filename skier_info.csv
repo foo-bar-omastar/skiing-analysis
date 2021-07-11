@@ -1,12 +1,12 @@
 ﻿Skier ID,Skier Name,Gender,Mass (kg),Height (cm),Pole Length (cm),Ski Location
-6,Harald, Man,90,190,160,Treadmill
-7,Hugo, Man,75,190,160,Treadmill
-8,Erik F, Man,75,175,145,Treadmill
-9,Erik B, Man,75,175,145,Treadmill
-10,Albin, Man,75,175,145,Treadmill
-16,Ida,Kvinna,71,179,149,Treadmill
-17,Julia,Kvinna,56,158,140,Treadmill
-18,Malte,Man,86,187,157,Treadmill
+6,Harald, Male,90,190,160,Treadmill
+7,Hugo, Male,75,190,160,Treadmill
+8,Erik F, Male,75,175,145,Treadmill
+9,Erik B, Male,75,175,145,Treadmill
+10,Albin, Male,75,175,145,Treadmill
+16,Ida,Female,71,179,149,Treadmill
+17,Julia,Female,56,158,140,Treadmill
+18,Malte,Male,86,187,157,Treadmill
 19,Linus,Male,77,177,149,Treadmill
 20,Emma,Female,60,172,148,Treadmill
 21,Amanda,Female,60,173,148,Treadmill
