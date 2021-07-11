@@ -7,23 +7,18 @@ from sklearn.neighbors import NearestNeighbors
 def get_dataframe(filepath_list, skier_list):
     """
     The main function to call to generate all dataframes
-
     Parameters
     ----------
     filepath_list : list of strings
         A list of the filepath for the CSV files for the source file
-
     skier_list : list of ints
         A list of the indentity of the different skiers.
-
     Returns
     -------
     df : dataframe
         Dataframe over the timeseries data
-
     df_peaks : dataframe
         Dataframe over the stroke information on a timeseries basis
-
     df_info : dataframe
         Dataframe over individual pulling, the dataframe for doing
         machine learning since it doesn't contain any timeseries information
@@ -69,15 +64,12 @@ def get_dataframe(filepath_list, skier_list):
 def generate_stroke_dataframe(filepath, i):
     """
     Function to call when getting data from one skier
-
     Parameters
     ----------
     filepath : str
         Filepath for the specific skier
-
     i : int
         Skier indentity
-
     Returns
     -------
     dataframe_dict : dict
@@ -86,7 +78,9 @@ def generate_stroke_dataframe(filepath, i):
     """
     # Reading CSV
     df = ImportData(filepath, i)
-    
+
+    df = clean_inactive_strokes(df)
+
     '''
     CHECK IF THIS NEEDS TO BE DONE FOR CURRENT USE CASE ALSO
     # Shifting the timeseries 12 seconds
@@ -142,15 +136,12 @@ def generate_stroke_dataframe(filepath, i):
 def ImportData(filepath, skier):
     """
     Function to read the CSV with correct headers
-
     Parameters
     ----------
     filepath : str
         The file location of the CSV-file
-
     skier : int
         The skier identity
-
     Returns
     -------
     df : Dataframe
@@ -200,7 +191,38 @@ def ImportData(filepath, skier):
     #trim = (df["Speed (km/h)"].values == 0) * (df["Time (sec)"].values > 800)
     trim = (df["Speed (km/h)"].values == 0)
     df = df[~trim]
+    
     return df
+
+
+
+def clean_inactive_strokes(df):
+
+  forces = ['Force left (N)','Force right (N)']
+
+  for i in range(len(forces)):
+  
+    seq = list(df[forces[i]])
+
+    width = 150
+
+    offset = width // 2
+    seq = [0] * offset + seq
+    result = []
+    for i in range(len(seq) - offset):
+        a = seq[i:i+width]
+        if max(set(a)) < 10:
+          result.append('0')
+        else:
+          result.append('1')
+
+    remove_indexes = [i for i, n in enumerate(result) if n == '0'] # List comprehension
+
+    df = df.drop(df.index[remove_indexes])
+    df = df.reset_index(drop=True)
+  
+  return df
+
 
 
 def GetStrokes(
@@ -216,33 +238,25 @@ def GetStrokes(
 ):
     """
     Gets the individual pullings frome the timeseries dataframe
-
     Parameters
     ----------
     df : dataframe
         Dataframe over timeseries
-
     pole: str
         Either "Left" or "Right"
-
     height : float
         Percentage threshold of max force that makes the peak detected
-
     distance: int
         Minimum distance between individual pullings
-
     rel_height : float
         Percentage of peak height for detecting where a peak starts. This makes
         the width of the peak
-
     cutoff_start : float
         Time to cutoff from the begining of the dataframe before starting to
         detect peaks
-
     cufoff_end : float
         Time to cutoff from the end of the dataframe before starting to detect
         peaks
-
     Returns
     -------
     df_peaks : dataframe
@@ -359,7 +373,6 @@ def GetStrokes(
     
     '''
     print(type(data))
-
     for key, value in data.items():
         #print value
         print(key, len([item for item in value if item]))
@@ -390,12 +403,10 @@ def GetStrokes(
 
 def GetInfo(df_peaks):
     """ Generating data over individual pulling with a non timeseries matter
-
     Parameters
     ----------
     df_peaks : dataframe
         Dataframe with data for individual pulling in a timeseries matter
-
     Returns
     -------
     df_info : dataframe
@@ -436,26 +447,20 @@ def add_left_and_right_diff(
 ):
     """ Algoritm for getting procentage between left and right pullings of the
     whole stroke and height difference
-
     Parameters
     ----------
     df_peaks_left : dataframe
         Timeseries data for individual left pullings
-
     df_peaks_right : dataframe
         Timeseries data for individual right pullings
-
     df_info_left : dataframe
         Non timeseries data for individual left pullings
-
     df_info_right : dataframe
         Non timeseries data for individual right pullings
-
     Returns
     -------
     df_info_left : dataframe
         Non timeseries data for individual left pullings
-
     df_info_right : dataframe
         Non timeseries data for individual right pullings
     """
@@ -522,19 +527,15 @@ def delete_outlier(
     quantile=0.001,
 ):
     """ Function for deleting outliers
-
     Parameters
     ----------
     trim_features : str list
         The features that we want to delete outliers for
-
     number_of_oly_up : int
         Number of features that we wishes to only delete outliers from the
         largest values
-
     quantile : float
         What quantile we wishes to delete, both as quantile but also 1-quantile
-
     Returns
     -------
     df : dataframe
